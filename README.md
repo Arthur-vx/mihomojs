@@ -17,9 +17,7 @@
 - ChatGPT
 - 券商（富途、Moomoo、长桥、老虎、Schwab 等）
 - 游戏下载
-- 育碧
-- Epic
-- EA
+- Epic ea 育碧
 - Steam-CN
 - Steam
   (Steam-CN直连，Steam走代理，即可实现代理社区等网页的同时直连下载游戏)
