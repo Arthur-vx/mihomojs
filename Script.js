@@ -302,6 +302,8 @@ const groupBaseOption = {
   hidden: false,
 };
 
+const directTestUrl = "https://wifi.vivo.com.cn/generate_204";
+
 const commonSelectProxies = [
   "节点选择",
   "全局直连",
@@ -1055,8 +1057,9 @@ function main(config) {
       ...groupBaseOption,
       name: "全局直连",
       type: "select",
+      url: directTestUrl,
       proxies: [
-        "DIRECT",
+        "直连",
         "节点选择",
       ],
       icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/link.svg",
