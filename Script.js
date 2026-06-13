@@ -637,6 +637,8 @@ function addRegionGroupsToSelectors(groups, regionGroupNames) {
     "国外AI",
     "Netflix",
     "哔哩哔哩",
+    "Steam",
+    "Steam-CN",
     "苹果服务",
   ];
 
