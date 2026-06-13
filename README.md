@@ -2,24 +2,21 @@
 
 # 代理组
 
-- Speedtest
-- Github
-- Adobe(选择REJECT可防止盗版软件联网弹窗)
-- bilibili(港澳台或修改ip属地)
-- Tiktok
-- Netflix
-- Spotify(国内听歌可直连)
-- Telegram
-- Bing(防止rewards乱跳)
-- Onedrive
-- 微软服务
-- ChatGPT
-- 券商（富途、Moomoo、长桥、老虎、Schwab 等）
-- 游戏下载
-- Epic ea 育碧
-- Steam-CN
-- Steam
-  (Steam-CN直连，Steam走代理，即可实现代理社区等网页的同时直连下载游戏)
+当前脚本会覆盖并重新生成策略组，主要分为：
+
+- 总入口：节点选择
+- 手动入口：手动选择、手动选择备用、自建节点
+- AI/开发：国外AI、Github
+- 平台服务：Google、微软服务、苹果服务
+- 券商：券商（富途、Moomoo、长桥、老虎、Schwab 等）
+- 媒体：YouTube、Netflix、Spotify、TikTok、哔哩哔哩
+- 游戏：游戏专用、游戏下载、Steam、Steam-CN、Epic ea 育碧
+- 通讯与系统：Telegram、ProxyDNS、Speedtest
+- 过滤与下载：Adobe（可选 REJECT）、广告过滤、下载软件
+- 兜底：全局直连、漏网之鱼
+- 地区组：HK香港、SG新加坡、US美国、JP日本、TW台湾省、KR韩国、GB英国、DE德国、CA加拿大、AU澳大利亚、MY马来西亚、TR土耳其
+
+地区组会按节点名称自动生成，只有订阅里存在对应地区节点时才显示。Steam-CN 默认可直连，Steam 可走代理，用于兼顾社区网页和游戏下载。
 
 # DNS配置
 
