@@ -302,6 +302,14 @@ const groupBaseOption = {
   hidden: false,
 };
 
+const commonSelectProxies = [
+  "节点选择",
+  "全局直连",
+  "手动选择",
+  "手动选择备用",
+  "自建节点",
+];
+
 // YaNet/global_script.js 追加配置：只新增，不移除原有配置。
 const yanetSkipIps = [
   "10.0.0.0/8",
@@ -455,7 +463,7 @@ const yanetAdditionalGroups = [
     ...groupBaseOption,
     name: "国外AI",
     type: "select",
-    proxies: ["节点选择", "手动选择", "手动选择备用", "自建节点", "全局直连"],
+    proxies: [...commonSelectProxies],
     url: "https://chat.openai.com/cdn-cgi/trace",
     icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ChatGPT.png",
   },
@@ -471,7 +479,7 @@ const yanetAdditionalGroups = [
     ...groupBaseOption,
     name: "哔哩哔哩",
     type: "select",
-    proxies: ["节点选择", "手动选择", "手动选择备用", "全局直连"],
+    proxies: [...commonSelectProxies],
     url: "https://www.bilibili.tv/",
     icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/bilibili_3.png",
   },
@@ -493,7 +501,7 @@ const yanetAdditionalGroups = [
     ...groupBaseOption,
     name: "苹果服务",
     type: "select",
-    proxies: ["全局直连", "节点选择", "手动选择", "手动选择备用", "自建节点"],
+    proxies: [...commonSelectProxies],
     url: "https://www.apple.com/library/test/success.html",
     icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_2.png",
   },
@@ -622,12 +630,24 @@ function addRegionGroupsToSelectors(groups, regionGroupNames) {
     "Steam-CN",
     "Epic ea 育碧",
     "Telegram",
+    "苹果服务",
+  ];
+
+  const appendRegionSelectorNames = [
+    "国外AI",
+    "Netflix",
+    "哔哩哔哩",
+    "苹果服务",
   ];
 
   groups.forEach((group) => {
     if (selectorNames.includes(group.name)) {
       if (!Array.isArray(group.proxies)) group.proxies = [];
-      prependUnique(group.proxies, regionGroupNames);
+      if (appendRegionSelectorNames.includes(group.name)) {
+        pushUnique(group.proxies, regionGroupNames);
+      } else {
+        prependUnique(group.proxies, regionGroupNames);
+      }
     }
   });
 }
@@ -864,8 +884,7 @@ function main(config) {
       ...groupBaseOption,
       name: "国外AI",
       type: "select",
-      "include-all": true,
-      filter: "^(?!(.*尼日)).*(美|日|JP|US|Chat|jp|us).*",
+      proxies: [...commonSelectProxies],
       icon: "https://www.clashverge.dev/assets/icons/chatgpt.svg",
     },
     {
@@ -885,9 +904,7 @@ function main(config) {
       ...groupBaseOption,
       name: "哔哩哔哩",
       type: "select",
-      proxies: ["全局直连"],
-      "include-all": true,
-      filter: "港|澳|台|HK|TW|MO",
+      proxies: [...commonSelectProxies],
       icon: "https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/Bili.png",
     },
     {
@@ -906,9 +923,7 @@ function main(config) {
       ...groupBaseOption,
       name: "Netflix",
       type: "select",
-      proxies: ["节点选择", "手动选择", "手动选择备用", "自建节点"],
-      "include-all": true,
-      filter: "港|澳|台|HK|TW|MO",
+      proxies: [...commonSelectProxies],
       icon: "https://fastly.jsdelivr.net/gh/shindgewongxj/WHATSINStash@master/icon/netflix.png",
     },
     {
