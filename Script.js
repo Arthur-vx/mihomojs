@@ -198,7 +198,7 @@ const ruleProviders = {
     ...ruleProviderCommon,
     behavior: "classical",
     format: "text",
-    url: "https://github.com/Shattered217/ownrule-clash/raw/main/steam-CN.list",
+    url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/SteamCN.list",
     path: "./rulesets/loyalsoldier/steam-cn.list",
   },
   steam: {
