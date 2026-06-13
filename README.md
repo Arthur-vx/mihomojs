@@ -15,6 +15,7 @@
 - Onedrive
 - 微软服务
 - ChatGPT
+- 券商（富途、Moomoo、长桥、老虎、Schwab 等）
 - 游戏下载
 - 育碧
 - Epic
@@ -46,6 +47,9 @@
 # Clash Verge 全局拓展脚本
 
 - 脚本文件：[Script.js](./Script.js)
+- 券商分流规则引用：[Arthur-vx/broker-rules](https://github.com/Arthur-vx/broker-rules/blob/main/rule/Clash/Broker/Broker.yaml)
+- 券商策略组支持选择香港、新加坡、日本、台湾、美国等地区节点；地区组会按节点名称自动生成。
+- 如果使用 Clash Party / Clash Verge 的远程覆写，更新脚本后需要刷新订阅或重新应用覆写，运行配置才会重新生成并显示新增策略组。
 
 # Clash Verge 端建议配置
 
