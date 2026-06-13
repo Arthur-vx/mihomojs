@@ -381,24 +381,6 @@ const yanetRegionDefinitions = [
   },
 ];
 
-const yanetAutoGroupNames = [
-  "延迟选优",
-  "故障转移",
-  "负载均衡(散列)",
-  "负载均衡(轮询)",
-];
-
-const yanetAutoRegionNames = [
-  "HK香港",
-  "SG新加坡",
-  "JP日本",
-  "TW台湾省",
-  "US美国",
-];
-
-const yanetAutoProxyExcludeRegex =
-  /流量|剩余|套餐|到期|过期|官网|客服|群组|订阅|重置|倍率|expire|traffic|reset|test/i;
-
 const yanetRuleProviders = {
   applications: {
     type: "http",
@@ -473,7 +455,7 @@ const yanetAdditionalGroups = [
     ...groupBaseOption,
     name: "国外AI",
     type: "select",
-    proxies: ["节点选择", "手动选择", "手动选择备用", "自建节点", "延迟选优", "故障转移", "全局直连"],
+    proxies: ["节点选择", "手动选择", "手动选择备用", "自建节点", "全局直连"],
     url: "https://chat.openai.com/cdn-cgi/trace",
     icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ChatGPT.png",
   },
@@ -481,7 +463,7 @@ const yanetAdditionalGroups = [
     ...groupBaseOption,
     name: "YouTube",
     type: "select",
-    proxies: ["Google", "节点选择", "手动选择", "手动选择备用", "自建节点", "延迟选优", "故障转移"],
+    proxies: ["Google", "节点选择", "手动选择", "手动选择备用", "自建节点"],
     url: "https://www.youtube.com/s/desktop/494dd881/img/favicon.ico",
     icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/YouTube.png",
   },
@@ -497,7 +479,7 @@ const yanetAdditionalGroups = [
     ...groupBaseOption,
     name: "游戏专用",
     type: "select",
-    proxies: ["节点选择", "手动选择", "手动选择备用", "自建节点", "延迟选优", "故障转移", "全局直连"],
+    proxies: ["节点选择", "手动选择", "手动选择备用", "自建节点", "全局直连"],
     icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png",
   },
   {
@@ -511,7 +493,7 @@ const yanetAdditionalGroups = [
     ...groupBaseOption,
     name: "苹果服务",
     type: "select",
-    proxies: ["全局直连", "节点选择", "手动选择", "手动选择备用", "自建节点", "延迟选优", "故障转移"],
+    proxies: ["全局直连", "节点选择", "手动选择", "手动选择备用", "自建节点"],
     url: "https://www.apple.com/library/test/success.html",
     icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_2.png",
   },
@@ -519,12 +501,12 @@ const yanetAdditionalGroups = [
     ...groupBaseOption,
     name: "下载软件",
     type: "select",
-    proxies: ["全局直连", "REJECT", "节点选择", "手动选择", "手动选择备用", "自建节点", "延迟选优", "故障转移"],
+    proxies: ["全局直连", "REJECT", "节点选择", "手动选择", "手动选择备用", "自建节点"],
     icon: "https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Download.png",
   },
 ];
 
-// 策略组显示顺序：总入口 -> AI/开发 -> 媒体 -> 游戏 -> 通讯/系统 -> 基础网络 -> 手动/自动。
+// 策略组显示顺序：总入口 -> AI/开发 -> 媒体 -> 游戏 -> 通讯/系统 -> 基础网络 -> 手动/地区。
 const proxyGroupDisplayOrder = [
   "节点选择",
   "国外AI",
@@ -552,10 +534,6 @@ const proxyGroupDisplayOrder = [
   "手动选择",
   "手动选择备用",
   "自建节点",
-  "延迟选优",
-  "故障转移",
-  "负载均衡(散列)",
-  "负载均衡(轮询)",
   "全局直连",
   "漏网之鱼",
   "HK香港",
@@ -610,36 +588,6 @@ function buildRegionProxyGroups(proxies) {
   });
 
   return regionGroups.filter((group) => group.proxies.length > 0);
-}
-
-function buildAutoProxyNames(proxies) {
-  const proxyNames = [];
-
-  yanetAutoRegionNames.forEach((regionName) => {
-    const region = yanetRegionDefinitions.find((item) => item.name === regionName);
-    if (!region) return;
-
-    proxies.forEach((proxy) => {
-      const name = proxy?.name;
-      if (!name || yanetAutoProxyExcludeRegex.test(name)) return;
-      if (region.regex.test(name) && !proxyNames.includes(name)) {
-        proxyNames.push(name);
-      }
-    });
-  });
-
-  return proxyNames;
-}
-
-function applyAutoGroupCandidates(groups, proxies) {
-  const autoProxyNames = buildAutoProxyNames(proxies);
-  if (autoProxyNames.length === 0) return;
-
-  groups.forEach((group) => {
-    if (!yanetAutoGroupNames.includes(group.name)) return;
-    delete group["include-all"];
-    group.proxies = autoProxyNames;
-  });
 }
 
 function prependUnique(target, values) {
@@ -808,7 +756,6 @@ function applyYanetAdditions(config) {
   mergeUniqueByName(config["proxy-groups"], yanetAdditionalGroups);
   mergeUniqueByName(config["proxy-groups"], regionGroups);
   addRegionGroupsToSelectors(config["proxy-groups"], regionGroupNames);
-  applyAutoGroupCandidates(config["proxy-groups"], config.proxies);
   config["proxy-groups"] = sortProxyGroupsByDisplayOrder(config["proxy-groups"]);
   const matchRule = config["rules"].find((rule) => rule.startsWith("MATCH,"));
   const nonMatchRules = config["rules"].filter((rule) => !rule.startsWith("MATCH,"));
@@ -864,13 +811,9 @@ function main(config) {
       name: "节点选择",
       type: "select",
       proxies: [
-        "延迟选优",
         "手动选择",
         "手动选择备用",
         "自建节点",
-        "故障转移",
-        "负载均衡(散列)",
-        "负载均衡(轮询)",
       ],
       icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Airport.png",
     },
@@ -906,8 +849,6 @@ function main(config) {
         "手动选择",
         "手动选择备用",
         "自建节点",
-        "延迟选优",
-        "故障转移",
       ],
       icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Server.png",
     },
@@ -936,10 +877,6 @@ function main(config) {
         "手动选择",
         "手动选择备用",
         "自建节点",
-        "延迟选优",
-        "故障转移",
-        "负载均衡(散列)",
-        "负载均衡(轮询)",
         "全局直连",
       ],
       icon: "https://www.clashverge.dev/assets/icons/github.svg",
@@ -962,10 +899,6 @@ function main(config) {
         "手动选择",
         "手动选择备用",
         "自建节点",
-        "延迟选优",
-        "故障转移",
-        "负载均衡(散列)",
-        "负载均衡(轮询)",
       ],
       icon: "https://fastly.jsdelivr.net/gh/shindgewongxj/WHATSINStash@master/icon/tiktok.png",
     },
@@ -987,10 +920,6 @@ function main(config) {
         "手动选择",
         "手动选择备用",
         "自建节点",
-        "延迟选优",
-        "故障转移",
-        "负载均衡(散列)",
-        "负载均衡(轮询)",
       ],
       icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/google.svg",
     },
@@ -1003,10 +932,6 @@ function main(config) {
         "手动选择",
         "手动选择备用",
         "自建节点",
-        "延迟选优",
-        "故障转移",
-        "负载均衡(散列)",
-        "负载均衡(轮询)",
         "全局直连",
       ],
       url: "https://www.futunn.com/",
@@ -1022,10 +947,6 @@ function main(config) {
         "手动选择",
         "手动选择备用",
         "自建节点",
-        "延迟选优",
-        "故障转移",
-        "负载均衡(散列)",
-        "负载均衡(轮询)",
       ],
       icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png",
     },
@@ -1038,10 +959,6 @@ function main(config) {
         "手动选择",
         "手动选择备用",
         "自建节点",
-        "延迟选优",
-        "故障转移",
-        "负载均衡(散列)",
-        "负载均衡(轮询)",
       ],
       icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/telegram.svg",
     },
@@ -1055,10 +972,6 @@ function main(config) {
         "手动选择",
         "手动选择备用",
         "自建节点",
-        "延迟选优",
-        "故障转移",
-        "负载均衡(散列)",
-        "负载均衡(轮询)",
       ],
       icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/microsoft.svg",
     },
@@ -1079,10 +992,6 @@ function main(config) {
         "手动选择",
         "手动选择备用",
         "自建节点",
-        "延迟选优",
-        "故障转移",
-        "负载均衡(散列)",
-        "负载均衡(轮询)",
       ],
       icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Download.png",
     },
@@ -1096,10 +1005,6 @@ function main(config) {
         "手动选择",
         "手动选择备用",
         "自建节点",
-        "延迟选优",
-        "故障转移",
-        "负载均衡(散列)",
-        "负载均衡(轮询)",
       ],
       icon: "https://www.clashverge.dev/assets/icons/epic.svg",
     },
@@ -1113,10 +1018,6 @@ function main(config) {
         "手动选择",
         "手动选择备用",
         "自建节点",
-        "延迟选优",
-        "故障转移",
-        "负载均衡(散列)",
-        "负载均衡(轮询)",
       ],
       icon: "https://www.clashverge.dev/assets/icons/steam.svg",
     },
@@ -1129,44 +1030,9 @@ function main(config) {
         "手动选择",
         "手动选择备用",
         "自建节点",
-        "延迟选优",
-        "故障转移",
-        "负载均衡(散列)",
-        "负载均衡(轮询)",
         "全局直连",
       ],
       icon: "https://www.clashverge.dev/assets/icons/steam.svg",
-    },
-    {
-      ...groupBaseOption,
-      name: "延迟选优",
-      type: "url-test",
-      tolerance: 100,
-      "include-all": true,
-      icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/speed.svg",
-    },
-    {
-      ...groupBaseOption,
-      name: "故障转移",
-      type: "fallback",
-      "include-all": true,
-      icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/ambulance.svg",
-    },
-    {
-      ...groupBaseOption,
-      name: "负载均衡(散列)",
-      type: "load-balance",
-      strategy: "consistent-hashing",
-      "include-all": true,
-      icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/merry_go.svg",
-    },
-    {
-      ...groupBaseOption,
-      name: "负载均衡(轮询)",
-      type: "load-balance",
-      strategy: "round-robin",
-      "include-all": true,
-      icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/balance.svg",
     },
     {
       ...groupBaseOption,
@@ -1178,10 +1044,6 @@ function main(config) {
         "手动选择",
         "手动选择备用",
         "自建节点",
-        "延迟选优",
-        "故障转移",
-        "负载均衡(散列)",
-        "负载均衡(轮询)",
       ],
       "include-all": true,
       icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/link.svg",
@@ -1195,10 +1057,6 @@ function main(config) {
         "手动选择",
         "手动选择备用",
         "自建节点",
-        "延迟选优",
-        "故障转移",
-        "负载均衡(散列)",
-        "负载均衡(轮询)",
         "全局直连",
       ],
       "include-all": true,
