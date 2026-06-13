@@ -5,7 +5,6 @@
 - Speedtest
 - Github
 - Adobe(选择REJECT可防止盗版软件联网弹窗)
-- Pornhub(选择符合你xp的地区)
 - bilibili(港澳台或修改ip属地)
 - Tiktok
 - Netflix
