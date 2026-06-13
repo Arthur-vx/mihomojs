@@ -381,6 +381,24 @@ const yanetRegionDefinitions = [
   },
 ];
 
+const yanetAutoGroupNames = [
+  "延迟选优",
+  "故障转移",
+  "负载均衡(散列)",
+  "负载均衡(轮询)",
+];
+
+const yanetAutoRegionNames = [
+  "HK香港",
+  "SG新加坡",
+  "JP日本",
+  "TW台湾省",
+  "US美国",
+];
+
+const yanetAutoProxyExcludeRegex =
+  /流量|剩余|套餐|到期|过期|官网|客服|群组|订阅|重置|倍率|expire|traffic|reset|test/i;
+
 const yanetRuleProviders = {
   applications: {
     type: "http",
@@ -594,6 +612,36 @@ function buildRegionProxyGroups(proxies) {
   return regionGroups.filter((group) => group.proxies.length > 0);
 }
 
+function buildAutoProxyNames(proxies) {
+  const proxyNames = [];
+
+  yanetAutoRegionNames.forEach((regionName) => {
+    const region = yanetRegionDefinitions.find((item) => item.name === regionName);
+    if (!region) return;
+
+    proxies.forEach((proxy) => {
+      const name = proxy?.name;
+      if (!name || yanetAutoProxyExcludeRegex.test(name)) return;
+      if (region.regex.test(name) && !proxyNames.includes(name)) {
+        proxyNames.push(name);
+      }
+    });
+  });
+
+  return proxyNames;
+}
+
+function applyAutoGroupCandidates(groups, proxies) {
+  const autoProxyNames = buildAutoProxyNames(proxies);
+  if (autoProxyNames.length === 0) return;
+
+  groups.forEach((group) => {
+    if (!yanetAutoGroupNames.includes(group.name)) return;
+    delete group["include-all"];
+    group.proxies = autoProxyNames;
+  });
+}
+
 function prependUnique(target, values) {
   values
     .slice()
@@ -760,6 +808,7 @@ function applyYanetAdditions(config) {
   mergeUniqueByName(config["proxy-groups"], yanetAdditionalGroups);
   mergeUniqueByName(config["proxy-groups"], regionGroups);
   addRegionGroupsToSelectors(config["proxy-groups"], regionGroupNames);
+  applyAutoGroupCandidates(config["proxy-groups"], config.proxies);
   config["proxy-groups"] = sortProxyGroupsByDisplayOrder(config["proxy-groups"]);
   const matchRule = config["rules"].find((rule) => rule.startsWith("MATCH,"));
   const nonMatchRules = config["rules"].filter((rule) => !rule.startsWith("MATCH,"));
