@@ -197,16 +197,16 @@ const ruleProviders = {
   "steam-cn": {
     ...ruleProviderCommon,
     behavior: "classical",
-    format: "text",
-    url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/SteamCN.list",
-    path: "./rulesets/loyalsoldier/steam-cn.list",
+    format: "yaml",
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/SteamCN/SteamCN.yaml",
+    path: "./rulesets/loyalsoldier/steam-cn.yaml",
   },
   steam: {
     ...ruleProviderCommon,
     behavior: "classical",
-    format: "text",
-    url: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Steam.list",
-    path: "./rulesets/loyalsoldier/steam.list",
+    format: "yaml",
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Steam/Steam.yaml",
+    path: "./rulesets/loyalsoldier/steam.yaml",
   },
   "telegram-site": {
     ...ruleProviderCommon,
@@ -293,16 +293,17 @@ const rules = [
   "MATCH,漏网之鱼",
 ];
 // 代理组通用配置
+const directTestUrl = "https://wifi.vivo.com.cn/generate_204";
+const defaultTestUrl = directTestUrl;
+
 const groupBaseOption = {
   interval: 300,
   timeout: 3000,
-  url: "https://www.google.com/generate_204",
+  url: defaultTestUrl,
   lazy: true,
   "max-failed-times": 3,
   hidden: false,
 };
-
-const directTestUrl = "https://wifi.vivo.com.cn/generate_204";
 
 const commonSelectProxies = [
   "节点选择",
