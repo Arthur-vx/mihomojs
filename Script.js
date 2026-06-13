@@ -1056,11 +1056,7 @@ function main(config) {
       proxies: [
         "DIRECT",
         "节点选择",
-        "手动选择",
-        "手动选择备用",
-        "自建节点",
       ],
-      "include-all": true,
       icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/link.svg",
     },
     {
