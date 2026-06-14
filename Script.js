@@ -616,7 +616,6 @@ function addRegionGroupsToSelectors(groups, regionGroupNames) {
   if (regionGroupNames.length === 0) return;
 
   const selectorNames = [
-    "节点选择",
     "国外AI",
     "Github",
     "Google",
