@@ -10,13 +10,13 @@
 - 平台服务：Google、微软服务、苹果服务
 - 券商：券商（富途、Moomoo、长桥、老虎、Schwab 等）
 - 媒体：YouTube、Netflix、Spotify、TikTok、哔哩哔哩
-- 游戏：游戏专用、游戏下载、Steam、Steam-CN、Epic ea 育碧
+- 游戏：游戏专用、游戏下载、Steam、Epic ea 育碧
 - 通讯与系统：Telegram、ProxyDNS、Speedtest
 - 过滤与下载：Adobe（可选 REJECT）、广告过滤、下载软件
 - 兜底：全局直连、漏网之鱼
 - 地区组：HK香港、SG新加坡、US美国、JP日本、TW台湾省、KR韩国、GB英国、DE德国、CA加拿大、AU澳大利亚、MY马来西亚、TR土耳其
 
-地区组会按节点名称自动生成，只有订阅里存在对应地区节点时才显示。Steam-CN 默认可直连，Steam 可走代理，用于兼顾社区网页和游戏下载。
+地区组会按节点名称自动生成，只有订阅里存在对应地区节点时才显示。游戏下载使用国内游戏下载规则，Steam 可走代理，用于兼顾社区网页和游戏下载。
 
 # DNS配置
 

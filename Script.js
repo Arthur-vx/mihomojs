@@ -169,9 +169,9 @@ const ruleProviders = {
   gamedl: {
     ...ruleProviderCommon,
     behavior: "classical",
-    format: "text",
-    url: "https://github.com/ACL4SSR/ACL4SSR/raw/master/Clash/Ruleset/GameDownload.list",
-    path: "./rulesets/loyalsoldier/gamedl.list",
+    format: "yaml",
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Game/GameDownloadCN/GameDownloadCN.yaml",
+    path: "./rulesets/loyalsoldier/gamedl.yaml",
   },
   ubisoft: {
     ...ruleProviderCommon,
@@ -193,13 +193,6 @@ const ruleProviders = {
     format: "text",
     url: "https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/EA/EA.list",
     path: "./rulesets/loyalsoldier/ea.list",
-  },
-  "steam-cn": {
-    ...ruleProviderCommon,
-    behavior: "classical",
-    format: "yaml",
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/SteamCN/SteamCN.yaml",
-    path: "./rulesets/loyalsoldier/steam-cn.yaml",
   },
   steam: {
     ...ruleProviderCommon,
@@ -283,7 +276,6 @@ const rules = [
   "RULE-SET,ubisoft,Epic ea 育碧",
   "RULE-SET,epic,Epic ea 育碧",
   "RULE-SET,ea,Epic ea 育碧",
-  "RULE-SET,steam-cn,Steam-CN",
   "RULE-SET,steam,Steam",
   "RULE-SET,geolocation-!cn,节点选择",
   "RULE-SET,cn-site,全局直连",
@@ -533,7 +525,6 @@ const proxyGroupDisplayOrder = [
   "游戏专用",
   "游戏下载",
   "Steam",
-  "Steam-CN",
   "Epic ea 育碧",
   "Telegram",
   "苹果服务",
@@ -630,7 +621,6 @@ function addRegionGroupsToSelectors(groups, regionGroupNames) {
     "游戏专用",
     "游戏下载",
     "Steam",
-    "Steam-CN",
     "Epic ea 育碧",
     "Telegram",
     "苹果服务",
@@ -641,7 +631,6 @@ function addRegionGroupsToSelectors(groups, regionGroupNames) {
     "Netflix",
     "哔哩哔哩",
     "Steam",
-    "Steam-CN",
     "苹果服务",
   ];
 
@@ -1027,19 +1016,6 @@ function main(config) {
         "自建节点",
       ],
       icon: "https://www.clashverge.dev/assets/icons/epic.svg",
-    },
-    {
-      ...groupBaseOption,
-      name: "Steam-CN",
-      type: "select",
-      proxies: [
-        "全局直连",
-        "节点选择",
-        "手动选择",
-        "手动选择备用",
-        "自建节点",
-      ],
-      icon: "https://www.clashverge.dev/assets/icons/steam.svg",
     },
     {
       ...groupBaseOption,
