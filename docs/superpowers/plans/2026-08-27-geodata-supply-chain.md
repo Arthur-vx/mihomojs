@@ -186,7 +186,7 @@ Expected: all tests pass with 0 failures.
 
 - [ ] **Step 1: Create the workflow configuration**
 
-Use `ubuntu-latest` and `actions/checkout@v4`. Download each candidate asset and its `.sha256sum` file from `MetaCubeX/meta-rules-dat/releases/download/latest`, then run `sha256sum -c`. Download `mihomo-linux-amd64-v1.19.29.gz`, decompress it, copy candidate files to `runtime/GeoSite.dat`, `runtime/GeoIP.dat`, `runtime/country.mmdb`, and `runtime/ASN.mmdb`, render `smoke.json`, and run `./mihomo -t -f smoke.json -d runtime`.
+Use `ubuntu-latest` and `actions/checkout@v7`. Download each candidate asset and its `.sha256sum` file from `MetaCubeX/meta-rules-dat/releases/download/latest`, then run `sha256sum -c`. Download `mihomo-linux-amd64-v1.19.29.gz`, decompress it, copy candidate files to `runtime/GeoSite.dat`, `runtime/GeoIP.dat`, `runtime/country.mmdb`, and `runtime/ASN.mmdb`, render `smoke.json`, and run `./mihomo -t -f smoke.json -d runtime`.
 
 On scheduled failure, create or update the `geodata-compatibility` label, search open Issues by exact title, create one only when absent, and otherwise comment with the new run URL.
 
