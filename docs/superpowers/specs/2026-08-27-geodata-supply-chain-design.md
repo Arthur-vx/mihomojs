@@ -32,7 +32,7 @@ The release contains:
 
 - `geosite.dat`
 - `geoip-lite.dat`
-- `geoip.metadb`
+- `country.mmdb`
 - `GeoLite2-ASN.mmdb`
 - `SHA256SUMS`
 
