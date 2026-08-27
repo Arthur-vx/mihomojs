@@ -405,7 +405,6 @@ const serviceConfigs = [
       'GEOSITE,tvb,港澳台媒体',
       'GEOSITE,hkt,港澳台媒体',
       'GEOSITE,hkbn,港澳台媒体',
-      'GEOSITE,hkopentv,港澳台媒体',
       'GEOSITE,hkedcity,港澳台媒体',
       'GEOSITE,hkgolden,港澳台媒体',
       'GEOSITE,hketgroup,港澳台媒体',
