@@ -51,3 +51,31 @@
 - 打开自动设置全局路由
 - 打开严格路由
   <img width="2291" height="1132" alt="image" src="https://github.com/user-attachments/assets/243a805f-d433-460e-8519-5a127e22a5bc" />
+
+# GeoData 版本与兼容性检查
+
+生产配置关闭了 `geo-auto-update`，并固定使用不可变 Release
+[`geodata-20260827-0328`](https://github.com/Arthur-vx/mihomojs/releases/tag/geodata-20260827-0328)。
+这样上游 GeoSite 删除或改名标签时，不会直接导致客户端配置失效。
+
+工作流 [`.github/workflows/validate-geodata.yml`](./.github/workflows/validate-geodata.yml)
+会在推送、Pull Request、手动触发和每日定时任务中执行以下检查：
+
+- 校验上游四个 GeoData 文件的 SHA-256；
+- 确认 `Script.js` 引用的全部 GeoSite 标签仍然存在；
+- 生成完整测试配置；
+- 使用 Mihomo v1.19.29 执行真实配置检查。
+
+每日任务失败时会创建或更新一个 `GeoData compatibility check failed` Issue，生产 Release 不会自动变化。
+
+## 升级 GeoData
+
+1. 确认 `Validate GeoData compatibility` 工作流使用上游 `latest` 数据执行成功；
+2. 下载本次验证过的 `geosite.dat`、`geoip-lite.dat`、`country.mmdb` 和 `GeoLite2-ASN.mmdb`；
+3. 校验上游 `.sha256sum`，创建新的 `geodata-YYYYMMDD-HHMM` Release，禁止覆盖旧 Release；
+4. 只修改 `Script.js` 中的 Release 标签并重新执行全部检查；
+5. 推送后，在 Clash Party 中更新远程覆写并刷新订阅。
+
+## 回退 GeoData
+
+如果新数据出现非预期问题，把 `Script.js` 中的 `geodata-*` 标签改回上一个已验证版本并重新推送即可。旧 Release 不删除、不覆盖，因此回退不依赖上游状态。

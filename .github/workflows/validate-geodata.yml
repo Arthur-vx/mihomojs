@@ -1,0 +1,91 @@
+name: Validate GeoData compatibility
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 4 * * *'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run Node tests
+        run: |
+          node --check Script.js
+          node --test "tests/*.test.js"
+
+      - name: Download and verify upstream GeoData
+        run: |
+          mkdir -p candidate
+          base_url="https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest"
+          for asset in geosite.dat geoip-lite.dat country.mmdb GeoLite2-ASN.mmdb; do
+            curl --fail --location --retry 3 --output "candidate/${asset}" "${base_url}/${asset}"
+            curl --fail --location --retry 3 --output "candidate/${asset}.sha256sum" "${base_url}/${asset}.sha256sum"
+            (cd candidate && sha256sum --check "${asset}.sha256sum")
+          done
+
+      - name: Validate GeoSite references
+        run: node scripts/validate-geosite.js Script.js candidate/geosite.dat
+
+      - name: Render smoke configuration
+        run: node scripts/render-config.js Script.js smoke.json
+
+      - name: Download Mihomo v1.19.29
+        run: |
+          curl --fail --location --retry 3 \
+            --output mihomo.gz \
+            https://github.com/MetaCubeX/mihomo/releases/download/v1.19.29/mihomo-linux-amd64-v1.19.29.gz
+          gzip --decompress mihomo.gz
+          chmod +x mihomo
+
+      - name: Test candidate with Mihomo
+        run: |
+          mkdir -p runtime
+          cp candidate/geosite.dat runtime/GeoSite.dat
+          cp candidate/geoip-lite.dat runtime/GeoIP.dat
+          cp candidate/country.mmdb runtime/country.mmdb
+          cp candidate/GeoLite2-ASN.mmdb runtime/ASN.mmdb
+          ./mihomo -t -f smoke.json -d runtime
+
+      - name: Report scheduled incompatibility
+        if: failure() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ISSUE_TITLE: GeoData compatibility check failed
+        run: |
+          run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          gh label create geodata-compatibility \
+            --color D93F0B \
+            --description "Upstream GeoData is incompatible with Script.js" \
+            --force
+          issue_number="$(
+            gh issue list \
+              --state open \
+              --search "\"${ISSUE_TITLE}\" in:title" \
+              --json number,title \
+              --jq '.[] | select(.title == "GeoData compatibility check failed") | .number' \
+              | head -n 1
+          )"
+          if [ -z "${issue_number}" ]; then
+            gh issue create \
+              --title "${ISSUE_TITLE}" \
+              --label geodata-compatibility \
+              --body "The scheduled upstream GeoData validation failed. Run: ${run_url}"
+          else
+            gh issue comment "${issue_number}" \
+              --body "The scheduled upstream GeoData validation failed again. Run: ${run_url}"
+          fi

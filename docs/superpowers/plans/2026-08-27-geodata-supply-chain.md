@@ -171,7 +171,7 @@ Set `geo-auto-update` to `false`, remove the now-irrelevant update interval, and
 
 - [ ] **Step 4: Run the complete Node suite**
 
-Run: `node --test tests`
+Run: `node --test "tests/*.test.js"`
 
 Expected: all tests pass with 0 failures.
 
@@ -179,31 +179,26 @@ Expected: all tests pass with 0 failures.
 
 **Files:**
 - Create: `.github/workflows/validate-geodata.yml`
-- Create: `tests/workflow-contract.test.js`
 
 **Interfaces:**
 - Consumes: both Task 1 and Task 2 CLIs.
 - Produces: push, pull-request, manual, and daily validation; scheduled failure Issue titled `GeoData compatibility check failed` with label `geodata-compatibility`.
 
-- [ ] **Step 1: Write the failing workflow-contract test**
-
-Read `.github/workflows/validate-geodata.yml` and assert it contains the four triggers (`push`, `pull_request`, `workflow_dispatch`, and `schedule`), `permissions` for `contents: read` and `issues: write`, all four upstream assets and checksum suffixes, calls to both Node scripts, Mihomo `v1.19.29`, `mihomo -t`, `if: failure() && github.event_name == 'schedule'`, and `gh issue list` before `gh issue create`.
-
-- [ ] **Step 2: Run the test and verify RED**
-
-Run: `node --test tests/workflow-contract.test.js`
-
-Expected: FAIL because the workflow does not exist.
-
-- [ ] **Step 3: Create the workflow**
+- [ ] **Step 1: Create the workflow configuration**
 
 Use `ubuntu-latest` and `actions/checkout@v4`. Download each candidate asset and its `.sha256sum` file from `MetaCubeX/meta-rules-dat/releases/download/latest`, then run `sha256sum -c`. Download `mihomo-linux-amd64-v1.19.29.gz`, decompress it, copy candidate files to `runtime/GeoSite.dat`, `runtime/GeoIP.dat`, `runtime/country.mmdb`, and `runtime/ASN.mmdb`, render `smoke.json`, and run `./mihomo -t -f smoke.json -d runtime`.
 
 On scheduled failure, create or update the `geodata-compatibility` label, search open Issues by exact title, create one only when absent, and otherwise comment with the new run URL.
 
-- [ ] **Step 4: Run the full Node suite**
+- [ ] **Step 2: Validate the workflow with actionlint v1.7.12**
 
-Run: `node --test tests`
+Download `actionlint_1.7.12_windows_amd64.zip` and its published checksum from `rhysd/actionlint`, verify the archive hash, extract it to a temporary directory, and run `actionlint.exe .github/workflows/validate-geodata.yml`.
+
+Expected: exit `0` with no diagnostics.
+
+- [ ] **Step 3: Run the full Node suite**
+
+Run: `node --test "tests/*.test.js"`
 
 Expected: all tests pass with 0 failures.
 
@@ -270,7 +265,7 @@ Run:
 
 ```powershell
 node --check Script.js
-node --test tests
+node --test "tests/*.test.js"
 node scripts/validate-geosite.js Script.js <candidate-geosite.dat>
 node scripts/render-config.js Script.js smoke.json
 & 'D:\app\Clash Party\resources\sidecar\mihomo.exe' -t -f smoke.json -d <candidate-runtime-dir>
