@@ -642,8 +642,7 @@ function main(config) {
   config['find-process-mode'] = 'strict'
   config['geodata-mode'] = false
   config['geodata-loader'] = 'memconservative'
-  config['geo-auto-update'] = true
-  config['geo-update-interval'] = 24
+  config['geo-auto-update'] = false
 
   if (interfaceName.length > 0) {
     config['interface-name'] = interfaceName
@@ -701,10 +700,10 @@ function main(config) {
     'dns-hijack': ['any:53', 'tcp://any:53'],
   }
   config['geox-url'] = {
-    geoip: `${githubProxy}https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.dat`,
-    geosite: `${githubProxy}https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat`,
-    mmdb: `${githubProxy}https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb`,
-    asn: `${githubProxy}https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb`,
+    geoip: `${githubProxy}https://github.com/Arthur-vx/mihomojs/releases/download/geodata-20260827-0328/geoip-lite.dat`,
+    geosite: `${githubProxy}https://github.com/Arthur-vx/mihomojs/releases/download/geodata-20260827-0328/geosite.dat`,
+    mmdb: `${githubProxy}https://github.com/Arthur-vx/mihomojs/releases/download/geodata-20260827-0328/country.mmdb`,
+    asn: `${githubProxy}https://github.com/Arthur-vx/mihomojs/releases/download/geodata-20260827-0328/GeoLite2-ASN.mmdb`,
   }
 
   config.proxies.push({
