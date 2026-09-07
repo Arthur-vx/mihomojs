@@ -228,15 +228,16 @@ const allRegionDefinitions = [
     regex: /新加坡|🇸🇬|sg|singapore/i,
     icon: 'https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Singapore.png',
   },
-  {
-    name: 'CN中国大陆',
-    regex: /中国|🇨🇳|cn|china/i,
-    icon: 'https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China_Map.png',
-  },
+  // 台湾节点可能使用 🇨🇳 标识，需先匹配 TW 等地区名称。
   {
     name: 'TW台湾省',
     regex: /台湾|台灣|🇹🇼|tw|taiwan|tai wan/i,
     icon: 'https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China.png',
+  },
+  {
+    name: 'CN中国大陆',
+    regex: /中国|🇨🇳|cn|china/i,
+    icon: 'https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China_Map.png',
   },
   {
     name: 'GB英国',
