@@ -1,0 +1,40 @@
+name: Validate CN direct override
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Script-CN-Direct.js'
+      - 'scripts/refresh-cn-direct-rules.js'
+      - 'tests/cn-direct*.test.js'
+      - '.github/workflows/validate-cn-direct.yml'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Download Mihomo
+        run: |
+          curl --fail --location --retry 3 --output mihomo.gz \
+            https://github.com/MetaCubeX/mihomo/releases/download/v1.19.29/mihomo-linux-amd64-v1.19.29.gz
+          gzip --decompress mihomo.gz
+          chmod +x mihomo
+      - name: Check scripts and all tests including fail-closed runtime
+        env:
+          MIHOMO_BIN: ${{ github.workspace }}/mihomo
+        run: |
+          node --check Script-CN-Direct.js
+          node --check scripts/refresh-cn-direct-rules.js
+          node --test
+      - name: Validate standalone override with Mihomo
+        run: |
+          mkdir runtime
+          node scripts/render-config.js Script-CN-Direct.js runtime/config.json
+          ./mihomo -t -d runtime -f runtime/config.json
