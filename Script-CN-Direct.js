@@ -10989,10 +10989,20 @@ function main(config) {
     'exclude-type': 'Direct|Compatible|Dns',
   }
   if (providerNames.length) group.use = providerNames
-  // 覆盖内核默认 GLOBAL，防止切到全局模式后选到直连或含直连的旧组。
+  // GLOBAL 保留原有节点与代理组，只移除直接直连项。
+  const oldGlobal = oldGroups.find(item => item.name === 'GLOBAL')
+  const directNames = new Set(['DIRECT', 'COMPATIBLE', ...proxies.filter(proxy =>
+    ['direct', 'compatible'].includes(String(proxy.type).toLowerCase())
+  ).map(proxy => proxy.name)])
+  const globalOptions = oldGlobal?.proxies || [
+    ...oldGroups.filter(item => item.name !== 'GLOBAL').map(item => item.name),
+    ...proxies.map(proxy => proxy.name).filter(Boolean),
+  ]
   const globalGroup = {
-    name: 'GLOBAL', type: 'select', proxies: [overseas, 'REJECT'],
+    ...(oldGlobal || {}), name: 'GLOBAL', type: 'select',
+    proxies: [...new Set([overseas, 'REJECT', ...globalOptions.filter(name => name !== 'GLOBAL' && !directNames.has(name))])],
     'default-selected': overseas, 'empty-fallback': 'REJECT',
+    'exclude-type': 'Direct|Compatible',
   }
   config['proxy-groups'] = [group, globalGroup, ...oldGroups.filter(item => item.name !== 'GLOBAL')]
 

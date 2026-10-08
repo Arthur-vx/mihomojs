@@ -47,15 +47,27 @@ test('initial import rejects foreign traffic and never links to direct or inheri
   }
 })
 
-test('GLOBAL can only select the fail-closed overseas group or reject', () => {
+test('GLOBAL retains its existing nodes and groups and removes only direct options', () => {
   const input = sample()
-  input['proxy-groups'].push({ name: 'GLOBAL', type: 'select', proxies: ['DIRECT', 'Old mixed group'] })
+  input['proxy-groups'].push({ name: 'GLOBAL', type: 'select', proxies: ['DIRECT', 'Old mixed group', 'Unknown custom node / 8x', 'Legacy direct alias'] })
   const output = run(input)
   const globals = output['proxy-groups'].filter(group => group.name === 'GLOBAL')
   assert.equal(globals.length, 1)
-  assert.deepEqual(globals[0].proxies, [overseas(output).name, 'REJECT'])
+  assert.deepEqual(globals[0].proxies, [overseas(output).name, 'REJECT', 'Old mixed group', 'Unknown custom node / 8x'])
   assert.equal(globals[0]['default-selected'], overseas(output).name)
   assert.equal(globals[0]['empty-fallback'], 'REJECT')
+})
+
+test('default GLOBAL exposes all subscription nodes and inherited groups without DIRECT', () => {
+  const input = sample()
+  input.proxies.push({ name: 'Existing DNS helper', type: 'dns' })
+  const output = run(input)
+  const global = output['proxy-groups'].find(group => group.name === 'GLOBAL')
+  assert.ok(global.proxies.includes('Unknown custom node / 8x'))
+  assert.ok(global.proxies.includes('Old mixed group'))
+  assert.ok(global.proxies.includes('Existing DNS helper'))
+  assert.ok(!global.proxies.includes('DIRECT'))
+  assert.ok(!global.proxies.includes('Legacy direct alias'))
 })
 
 test('keeps unrecognized nodes, credentials, providers and existing group definitions intact', () => {
