@@ -10989,7 +10989,12 @@ function main(config) {
     'exclude-type': 'Direct|Compatible|Dns',
   }
   if (providerNames.length) group.use = providerNames
-  config['proxy-groups'] = [group, ...oldGroups]
+  // 覆盖内核默认 GLOBAL，防止切到全局模式后选到直连或含直连的旧组。
+  const globalGroup = {
+    name: 'GLOBAL', type: 'select', proxies: [overseas, 'REJECT'],
+    'default-selected': overseas, 'empty-fallback': 'REJECT',
+  }
+  config['proxy-groups'] = [group, globalGroup, ...oldGroups.filter(item => item.name !== 'GLOBAL')]
 
   // 未选择节点时，仍有完整国内规则；不用临时直连 GitHub 来下载规则。
   ruleProviders[domainSet] = { type: 'inline', behavior: 'domain', payload: CN_DIRECT_SNAPSHOT.domains }

@@ -47,6 +47,17 @@ test('initial import rejects foreign traffic and never links to direct or inheri
   }
 })
 
+test('GLOBAL can only select the fail-closed overseas group or reject', () => {
+  const input = sample()
+  input['proxy-groups'].push({ name: 'GLOBAL', type: 'select', proxies: ['DIRECT', 'Old mixed group'] })
+  const output = run(input)
+  const globals = output['proxy-groups'].filter(group => group.name === 'GLOBAL')
+  assert.equal(globals.length, 1)
+  assert.deepEqual(globals[0].proxies, [overseas(output).name, 'REJECT'])
+  assert.equal(globals[0]['default-selected'], overseas(output).name)
+  assert.equal(globals[0]['empty-fallback'], 'REJECT')
+})
+
 test('keeps unrecognized nodes, credentials, providers and existing group definitions intact', () => {
   const input = sample()
   input['proxy-providers'] = { subscription: { type: 'http', url: 'https://example.org/private-token', path: './providers/nodes.yaml' } }

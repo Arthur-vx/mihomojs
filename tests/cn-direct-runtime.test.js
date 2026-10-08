@@ -125,6 +125,9 @@ test('Mihomo keeps CN traffic direct while unselected or disconnected overseas t
   const groupPath = `/proxies/${encodeURIComponent(group)}`
   const initial = await api(groupPath)
   assert.equal(initial.now, 'REJECT')
+  const global = await api('/proxies/GLOBAL')
+  assert.deepEqual(global.all, [group, 'REJECT'])
+  assert.equal(global.now, group)
   assert.ok(!initial.all.includes('Provider direct alias'), JSON.stringify(initial))
   assert.ok(initial.all.includes('Provider overseas'))
   const domestic = await getVia(port, `http://www.qq.com:${directPort}/`)
