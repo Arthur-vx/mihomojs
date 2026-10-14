@@ -10972,7 +10972,6 @@ function main(config) {
   const providerNames = Object.keys(config['proxy-providers'] || {})
   const names = new Set([...proxies, ...oldGroups].map(item => item.name))
   const overseas = cnDirectUniqueName('海外节点（手动选择）', names)
-  const claude = cnDirectUniqueName('Claude', names)
   const ruleProviders = { ...(config['rule-providers'] || {}) }
   const ruleNames = new Set(Object.keys(ruleProviders))
   const domainSet = cnDirectUniqueName('cn-direct-domain', ruleNames)
@@ -10990,13 +10989,6 @@ function main(config) {
     'exclude-type': 'Direct|Compatible|Dns',
   }
   if (providerNames.length) group.use = providerNames
-  const claudeGroup = {
-    name: claude, type: 'select',
-    proxies: ['REJECT', overseas, ...new Set(nodeNames)],
-    'default-selected': 'REJECT', 'empty-fallback': 'REJECT',
-    'exclude-type': 'Direct|Compatible|Dns',
-  }
-  if (providerNames.length) claudeGroup.use = providerNames
   // GLOBAL 保留原有节点与代理组，只移除直接直连项。
   const oldGlobal = oldGroups.find(item => item.name === 'GLOBAL')
   const directNames = new Set(['DIRECT', 'COMPATIBLE', ...proxies.filter(proxy =>
@@ -11012,7 +11004,7 @@ function main(config) {
     'default-selected': overseas, 'empty-fallback': 'REJECT',
     'exclude-type': 'Direct|Compatible',
   }
-  config['proxy-groups'] = [group, claudeGroup, globalGroup, ...oldGroups.filter(item => item.name !== 'GLOBAL')]
+  config['proxy-groups'] = [group, globalGroup, ...oldGroups.filter(item => item.name !== 'GLOBAL')]
 
   // 未选择节点时，仍有完整国内规则；不用临时直连 GitHub 来下载规则。
   ruleProviders[domainSet] = { type: 'inline', behavior: 'domain', payload: CN_DIRECT_SNAPSHOT.domains }
@@ -11022,41 +11014,9 @@ function main(config) {
     if (ruleProviders[name].type === 'http') ruleProviders[name] = { ...ruleProviders[name], proxy: overseas }
   }
   config['rule-providers'] = ruleProviders
-  const claudeRules = [
-    // Claude / Anthropic 核心域名
-    `DOMAIN-SUFFIX,anthropic.com,${claude}`,
-    `DOMAIN-SUFFIX,claude.ai,${claude}`,
-    `DOMAIN-SUFFIX,claude.com,${claude}`,
-    `DOMAIN-SUFFIX,clau.de,${claude}`,
-    `DOMAIN-SUFFIX,claudemcpclient.com,${claude}`,
-    `DOMAIN-SUFFIX,claudemcpcontent.com,${claude}`,
-    `DOMAIN-SUFFIX,claudeusercontent.com,${claude}`,
-    `DOMAIN-SUFFIX,cdn.anthropic.com,${claude}`,
-    `DOMAIN,mcp.anthropic.com,${claude}`,
-    `DOMAIN,console.anthropic.com,${claude}`,
-    `DOMAIN,workbench.anthropic.com,${claude}`,
-    `DOMAIN,anthropic.com.cdn.cloudflare.net,${claude}`,
-    `DOMAIN,servd-anthropic-website.b-cdn.net,${claude}`,
-    `DOMAIN,anthropic.auth0.com,${claude}`,
-    `DOMAIN,anthropic-com.ghost.io,${claude}`,
-    // 监控、反欺诈和第三方组件，保持出口一致
-    `DOMAIN-SUFFIX,sentry.io,${claude}`,
-    `DOMAIN-SUFFIX,statsigapi.net,${claude}`,
-    `DOMAIN,browser-intake-us5-datadoghq.com,${claude}`,
-    `DOMAIN-KEYWORD,datadog,${claude}`,
-    `DOMAIN-KEYWORD,sift,${claude}`,
-    `DOMAIN-SUFFIX,intercom.io,${claude}`,
-    `DOMAIN-SUFFIX,intercomcdn.com,${claude}`,
-    `DOMAIN,cdn.usefathom.com,${claude}`,
-    // Anthropic IP / ASN 兜底
-    `IP-CIDR,160.79.104.0/21,${claude},no-resolve`,
-    `IP-CIDR6,2607:6bc0::/32,${claude},no-resolve`,
-    `IP-ASN,399358,${claude},no-resolve`,
-    // NTP 时区检测也走同一出口
-    `GEOSITE,category-ntp,${claude}`,
-  ]
   config.rules = [...new Set([
-    ...claudeRules,
+    `DOMAIN-SUFFIX,claude.ai,${overseas}`,
+    `DOMAIN-SUFFIX,anthropic.com,${overseas}`,
     ...CN_DIRECT_LOCAL_SUFFIXES.map(suffix => `DOMAIN-SUFFIX,${suffix},DIRECT`),
     ...CN_DIRECT_PRIVATE_CIDRS.map(cidr => `${cidr.includes(':') ? 'IP-CIDR6' : 'IP-CIDR'},${cidr},DIRECT,no-resolve`),
     ...preservedLAN,
@@ -11067,7 +11027,6 @@ function main(config) {
 
   const domesticDNS = ['https://doh.pub/dns-query#DIRECT', 'https://dns.alidns.com/dns-query#DIRECT']
   const foreignDNS = [`https://1.1.1.1/dns-query#${overseas}`, `https://8.8.8.8/dns-query#${overseas}`]
-  const claudeDNS = [`https://1.1.1.1/dns-query#${claude}`, `https://8.8.8.8/dns-query#${claude}`]
   config.dns = {
     enable: true, listen: '127.0.0.1:1053', ipv6: false,
     'respect-rules': true, 'prefer-h3': false,
@@ -11080,10 +11039,8 @@ function main(config) {
     'direct-nameserver': domesticDNS, 'direct-nameserver-follow-policy': true,
     nameserver: foreignDNS, fallback: [],
     'nameserver-policy': {
-      '+.claude.ai': claudeDNS,
-      '+.claude.com': claudeDNS,
-      '+.clau.de': claudeDNS,
-      '+.anthropic.com': claudeDNS,
+      '+.claude.ai': foreignDNS,
+      '+.anthropic.com': foreignDNS,
       ...Object.fromEntries(CN_DIRECT_LOCAL_SUFFIXES.map(suffix => [`+.${suffix}`, ['system']])),
       [`rule-set:${domainSet}`]: domesticDNS,
     },

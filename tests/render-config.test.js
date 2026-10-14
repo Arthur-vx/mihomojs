@@ -13,21 +13,6 @@ test('renders a usable Mihomo configuration from the real script', () => {
   assert.ok(Object.keys(config['rule-providers']).length > 0)
 })
 
-test('keeps Claude traffic in its dedicated strategy group', () => {
-  const source = fs.readFileSync(path.join(__dirname, '..', 'Script.js'), 'utf8')
-  const config = renderConfig(source)
-  const group = config['proxy-groups'].find(item => item.name === 'Claude')
-
-  assert.ok(group, 'Claude strategy group missing')
-  for (const rule of [
-    'DOMAIN-SUFFIX,anthropic.com,Claude',
-    'DOMAIN-SUFFIX,claude.ai,Claude',
-    'IP-CIDR,160.79.104.0/21,Claude,no-resolve',
-  ]) {
-    assert.ok(config.rules.includes(rule), rule)
-  }
-})
-
 test('rejects a script that does not define main', () => {
   assert.throws(() => renderConfig('const value = 1'), /Script\.js must define main\(config\)/)
 })
