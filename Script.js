@@ -133,6 +133,7 @@ let ruleOptions = {
   broker: false,
   github: false,
   google: false,
+  claude: false,
   openai: false,
   spotify: false,
   youtube: false,
@@ -359,6 +360,45 @@ const multiplierRegex =
 // --- 2. 服务规则数据结构 ---
 // Icons 更新为 GitHub Raw
 const serviceConfigs = [
+  {
+    key: 'claude',
+    name: 'Claude',
+    icon: 'https://claude.ai/favicon.ico',
+    url: 'https://claude.ai/',
+    rules: [
+      // Claude / Anthropic 核心域名
+      'DOMAIN-SUFFIX,anthropic.com,Claude',
+      'DOMAIN-SUFFIX,claude.ai,Claude',
+      'DOMAIN-SUFFIX,claude.com,Claude',
+      'DOMAIN-SUFFIX,clau.de,Claude',
+      'DOMAIN-SUFFIX,claudemcpclient.com,Claude',
+      'DOMAIN-SUFFIX,claudemcpcontent.com,Claude',
+      'DOMAIN-SUFFIX,claudeusercontent.com,Claude',
+      'DOMAIN-SUFFIX,cdn.anthropic.com,Claude',
+      'DOMAIN,mcp.anthropic.com,Claude',
+      'DOMAIN,console.anthropic.com,Claude',
+      'DOMAIN,workbench.anthropic.com,Claude',
+      'DOMAIN,anthropic.com.cdn.cloudflare.net,Claude',
+      'DOMAIN,servd-anthropic-website.b-cdn.net,Claude',
+      'DOMAIN,anthropic.auth0.com,Claude',
+      'DOMAIN,anthropic-com.ghost.io,Claude',
+      // 监控、反欺诈和第三方组件，保持出口一致
+      'DOMAIN-SUFFIX,sentry.io,Claude',
+      'DOMAIN-SUFFIX,statsigapi.net,Claude',
+      'DOMAIN,browser-intake-us5-datadoghq.com,Claude',
+      'DOMAIN-KEYWORD,datadog,Claude',
+      'DOMAIN-KEYWORD,sift,Claude',
+      'DOMAIN-SUFFIX,intercom.io,Claude',
+      'DOMAIN-SUFFIX,intercomcdn.com,Claude',
+      'DOMAIN,cdn.usefathom.com,Claude',
+      // Anthropic IP / ASN 兜底
+      'IP-CIDR,160.79.104.0/21,Claude,no-resolve',
+      'IP-CIDR6,2607:6bc0::/32,Claude,no-resolve',
+      'IP-ASN,399358,Claude,no-resolve',
+      // NTP 时区检测也走同一出口
+      'GEOSITE,category-ntp,Claude',
+    ],
+  },
   {
     key: 'openai',
     name: '国外AI',

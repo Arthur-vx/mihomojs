@@ -124,14 +124,16 @@ test('CN domain and IP datasets are available without any network downloads', ()
   assert.ok(output.rules.indexOf(domainRule) < output.rules.indexOf(ipRule))
 })
 
-test('Claude and Anthropic are routed overseas ahead of CN IP and LAN providers', () => {
+test('Claude and Anthropic use their dedicated group ahead of CN IP and LAN providers', () => {
   const output = run(sample())
-  const group = overseas(output)
-  for (const domain of ['claude.ai', 'anthropic.com']) {
+  const group = output['proxy-groups'].find(item => item.name === 'Claude')
+  assert.ok(group)
+  for (const domain of ['claude.ai', 'anthropic.com', 'claude.com', 'clau.de']) {
     const index = output.rules.indexOf(`DOMAIN-SUFFIX,${domain},${group.name}`)
     assert.ok(index >= 0)
     assert.ok(index < output.rules.findIndex(rule => rule.startsWith('IP-CIDR,')))
   }
+  assert.ok(group.proxies.includes(overseas(output).name))
 })
 
 test('foreign DNS always uses the manual overseas group and hosts cannot redirect it', () => {
